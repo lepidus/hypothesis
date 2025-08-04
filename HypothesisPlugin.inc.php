@@ -14,6 +14,8 @@
 
 import('lib.pkp.classes.plugins.GenericPlugin');
 
+define('NMI_TYPE_ANNOTATIONS',	'NMI_TYPE_ANNOTATIONS');
+
 class HypothesisPlugin extends GenericPlugin {
 	/**
 	 * @copydoc Plugin::register()
@@ -28,6 +30,7 @@ class HypothesisPlugin extends GenericPlugin {
 			HookRegistry::register('AcronPlugin::parseCronTab', [$this, 'addTasksToCrontab']);
 
 			HookRegistry::register('NavigationMenus::itemTypes', array($this, 'addNavigationMenuItemType'));
+			HookRegistry::register('NavigationMenus::displaySettings', array($this, 'setNavigationMenuItemUrl'));
 
 			$this->addHandlerURLToJavaScript();
 
@@ -169,11 +172,29 @@ class HypothesisPlugin extends GenericPlugin {
 
 	public function addNavigationMenuItemType($hookName, $args) {
 		$itemTypes = &$args[0];
-		$itemTypes['NMI_TYPE_ANNOTATIONS'] = [
+		$itemTypes[NMI_TYPE_ANNOTATIONS] = [
 			'title' => __('plugins.generic.hypothesis.announcementsMenuItem.title'),
 			'description' => __('plugins.generic.hypothesis.announcementsMenuItem.description'),
 		];
 		return false;
+	}
+
+	public function setNavigationMenuItemUrl($hookName, $args) {
+		$menuItem = &$args[0];
+
+		if ($menuItem->getType() === NMI_TYPE_ANNOTATIONS) {
+			$request = Application::get()->getRequest();
+			$dispatcher = $request->getDispatcher();
+
+			$menuItem->setUrl($dispatcher->url(
+				$request,
+				ROUTE_PAGE,
+				null,
+				'annotations',
+				null,
+				null
+			));
+		}
 	}
 
 	/**
@@ -195,5 +216,27 @@ class HypothesisPlugin extends GenericPlugin {
 	function getStyleSheet() {
 		return $this->getPluginPath() . '/styles/annotationViewer.css';
 	}
+
+	public function setEnabled($enabled)
+    {
+        parent::setEnabled($enabled);
+		
+		$contextId = $this->getCurrentContextId();
+        if ($enabled && $contextId != CONTEXT_SITE) {
+			$navigationMenuItemDao = DAORegistry::getDAO('NavigationMenuItemDAO');
+			$menuItems = $navigationMenuItemDao->getByType(NMI_TYPE_ANNOTATIONS, $contextId)->toArray();
+
+			if(empty($menuItems)) {
+				$locale = AppLocale::getLocale();
+
+				$menuItem = $navigationMenuItemDao->newDataObject();
+				$menuItem->setTitle(__('plugins.generic.hypothesis.announcementsMenuItem.title'), $locale);
+				$menuItem->setContextId($contextId);
+				$menuItem->setType(NMI_TYPE_ANNOTATIONS);
+
+				$navigationMenuItemDao->insertObject($menuItem);
+			}
+        }
+    }
 }
 
