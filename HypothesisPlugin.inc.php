@@ -27,6 +27,8 @@ class HypothesisPlugin extends GenericPlugin {
 			HookRegistry::register('LoadComponentHandler', array($this, 'setupHypothesisHandler'));
 			HookRegistry::register('AcronPlugin::parseCronTab', [$this, 'addTasksToCrontab']);
 
+			HookRegistry::register('NavigationMenus::itemTypes', array($this, 'addNavigationMenuItemType'));
+
 			$this->addHandlerURLToJavaScript();
 
 			return true;
@@ -163,6 +165,15 @@ class HypothesisPlugin extends GenericPlugin {
 	
 			$templateMgr->addJavaScript('HypothesisHandler', 'app = ' . json_encode($data) . ';', ['contexts' => 'frontend', 'inline' => true]);
 		}
+	}
+
+	public function addNavigationMenuItemType($hookName, $args) {
+		$itemTypes = &$args[0];
+		$itemTypes['NMI_TYPE_ANNOTATIONS'] = [
+			'title' => __('plugins.generic.hypothesis.announcementsMenuItem.title'),
+			'description' => __('plugins.generic.hypothesis.announcementsMenuItem.description'),
+		];
+		return false;
 	}
 
 	/**
