@@ -17,9 +17,13 @@ namespace APP\plugins\generic\hypothesis;
 use PKP\plugins\GenericPlugin;
 use PKP\plugins\Hook;
 use APP\core\Application;
+use PKP\facades\Locale;
+use PKP\db\DAORegistry;
 use APP\template\TemplateManager;
 
 class HypothesisPlugin extends GenericPlugin {
+	private const NMI_TYPE_ANNOTATIONS = 'NMI_TYPE_ANNOTATIONS';
+	
 	/**
 	 * @copydoc Plugin::register()
 	 */
@@ -31,6 +35,9 @@ class HypothesisPlugin extends GenericPlugin {
 			Hook::add('LoadHandler', array($this, 'addAnnotationsHandler'));
 			Hook::add('LoadComponentHandler', array($this, 'setupHypothesisHandler'));
 			Hook::add('AcronPlugin::parseCronTab', [$this, 'addTasksToCrontab']);
+
+			Hook::add('NavigationMenus::itemTypes', [$this, 'addNavigationMenuItemType']);
+			Hook::add('NavigationMenus::displaySettings', [$this, 'setNavigationMenuItemUrl']);
 
 			$this->addHandlerURLToJavaScript();
 
@@ -165,6 +172,34 @@ class HypothesisPlugin extends GenericPlugin {
         $templateMgr->addJavaScript('HypothesisHandler', 'app = ' . json_encode($data) . ';', ['contexts' => 'frontend', 'inline' => true]);
     }
 
+	public function addNavigationMenuItemType($hookName, $args) {
+		$itemTypes = &$args[0];
+
+		$itemTypes[self::NMI_TYPE_ANNOTATIONS] = [
+			'title' => __('plugins.generic.hypothesis.annotationsMenuItem.title'),
+			'description' => __('plugins.generic.hypothesis.annotationsMenuItem.description')
+		];
+		
+		return Hook::CONTINUE;
+	}
+	
+	public function setNavigationMenuItemUrl($hookName, $args) {
+		$menuItem = &$args[0];
+
+		if ($menuItem->getType() === self::NMI_TYPE_ANNOTATIONS) {
+			$request = Application::get()->getRequest();
+			$dispatcher = $request->getDispatcher();
+			$menuItem->setUrl($dispatcher->url(
+				$request,
+				ROUTE_PAGE,
+				null,
+				'annotations',
+				null,
+				null
+			));
+		}
+	}
+
 	/**
 	 * Get the display name of this plugin
 	 * @return string
@@ -180,5 +215,23 @@ class HypothesisPlugin extends GenericPlugin {
 	function getDescription() {
 		return __('plugins.generic.hypothesis.description');
 	}
+
+	public function setEnabled($enabled){
+        parent::setEnabled($enabled);
+		
+		$contextId = $this->getCurrentContextId();
+        if ($enabled && $contextId != Application::CONTEXT_SITE) {
+			$navigationMenuItemDao = DAORegistry::getDAO('NavigationMenuItemDAO');
+			$menuItems = $navigationMenuItemDao->getByType(self::NMI_TYPE_ANNOTATIONS, $contextId)->toArray();
+			if(empty($menuItems)) {
+				$locale = Locale::getLocale();
+				$menuItem = $navigationMenuItemDao->newDataObject();
+				$menuItem->setTitle(__('plugins.generic.hypothesis.annotationsMenuItem.title'), $locale);
+				$menuItem->setContextId($contextId);
+				$menuItem->setType(self::NMI_TYPE_ANNOTATIONS);
+				$navigationMenuItemDao->insertObject($menuItem);
+			}
+        }
+    }
 }
 

@@ -40,3 +40,9 @@ msgstr "Date published"
 
 msgid "plugins.generic.hypothesis.orderBy.lastAnnotation"
 msgstr "Date of last annotation"
+
+msgid "plugins.generic.hypothesis.annotationsMenuItem.title"
+msgstr "Annotations"
+
+msgid "plugins.generic.hypothesis.annotationsMenuItem.description"
+msgstr "Link to the page displaying annotations on PDF galleys"
