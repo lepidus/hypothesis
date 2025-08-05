@@ -43,8 +43,8 @@ msgstr "Fecha de publicación"
 msgid "plugins.generic.hypothesis.orderBy.lastAnnotation"
 msgstr "Fecha de la última annotación"
 
-msgid "plugins.generic.hypothesis.announcementsMenuItem.title"
+msgid "plugins.generic.hypothesis.annotationsMenuItem.title"
 msgstr "Anotaciones"
 
-msgid "plugins.generic.hypothesis.announcementsMenuItem.description"
+msgid "plugins.generic.hypothesis.annotationsMenuItem.description"
 msgstr "Enlace a la página que muestra anotaciones en PDFs de galeradas"

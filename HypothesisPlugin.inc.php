@@ -173,8 +173,8 @@ class HypothesisPlugin extends GenericPlugin {
 	public function addNavigationMenuItemType($hookName, $args) {
 		$itemTypes = &$args[0];
 		$itemTypes[NMI_TYPE_ANNOTATIONS] = [
-			'title' => __('plugins.generic.hypothesis.announcementsMenuItem.title'),
-			'description' => __('plugins.generic.hypothesis.announcementsMenuItem.description'),
+			'title' => __('plugins.generic.hypothesis.annotationsMenuItem.title'),
+			'description' => __('plugins.generic.hypothesis.annotationsMenuItem.description'),
 		];
 		return false;
 	}
@@ -230,7 +230,7 @@ class HypothesisPlugin extends GenericPlugin {
 				$locale = AppLocale::getLocale();
 
 				$menuItem = $navigationMenuItemDao->newDataObject();
-				$menuItem->setTitle(__('plugins.generic.hypothesis.announcementsMenuItem.title'), $locale);
+				$menuItem->setTitle(__('plugins.generic.hypothesis.annotationsMenuItem.title'), $locale);
 				$menuItem->setContextId($contextId);
 				$menuItem->setType(NMI_TYPE_ANNOTATIONS);
 

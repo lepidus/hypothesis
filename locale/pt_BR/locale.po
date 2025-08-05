@@ -43,8 +43,8 @@ msgstr "Data de postagem"
 msgid "plugins.generic.hypothesis.orderBy.lastAnnotation"
 msgstr "Data da última anotação"
 
-msgid "plugins.generic.hypothesis.announcementsMenuItem.title"
+msgid "plugins.generic.hypothesis.annotationsMenuItem.title"
 msgstr "Anotações"
 
-msgid "plugins.generic.hypothesis.announcementsMenuItem.description"
+msgid "plugins.generic.hypothesis.annotationsMenuItem.description"
 msgstr "Link para a página exibindo anotações em PDFs de composições finais"
